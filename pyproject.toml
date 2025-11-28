@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "titer"
+version = "0.1.0"
+description = "LLM keyword and citation titer tool"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "click>=8.1",
+    "python-dotenv>=1.0.1",
+    "openai>=1.61.0",
+]
+
+[project.scripts]
+titer = "titer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/titer"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "README.md", "pyproject.toml", "main.py"]
+
+[dependency-groups]
+dev = [
+    "httpx[socks]>=0.28.1",
+]
