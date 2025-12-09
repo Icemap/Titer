@@ -12,3 +12,4 @@ wheels/
 .env
 outputs
 example-task.csv
+service_account.json

@@ -4,13 +4,17 @@ from typing import Callable, Dict
 
 from .base import Engine
 from .openai_engine import OpenAIEngine
+from .gemini_engine import GeminiEngine
 
 
 class EngineFactory:
     """Factory to resolve engine names to instances."""
 
     def __init__(self) -> None:
-        self._registry: Dict[str, Callable[[str], Engine]] = {"openai": self._build_openai}
+        self._registry: Dict[str, Callable[[str], Engine]] = {
+            "openai": self._build_openai,
+            "gemini": self._build_gemini,
+        }
 
     def create(self, engine_name: str) -> Engine:
         provider, model = self._split_engine_name(engine_name)
@@ -29,3 +33,6 @@ class EngineFactory:
 
     def _build_openai(self, model: str) -> Engine:
         return OpenAIEngine(model=model)
+
+    def _build_gemini(self, model: str) -> Engine:
+        return GeminiEngine(model=model)
