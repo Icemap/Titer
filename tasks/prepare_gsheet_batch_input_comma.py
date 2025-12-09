@@ -16,7 +16,7 @@ def populate_sheet(
     share_public: bool = False,
     include_gemini: bool = False,
 ) -> str:
-    """Populate a Google Sheet worksheet with sample batch tasks."""
+    """Populate a Google Sheet worksheet with comma-separated batch tasks."""
     load_project_env()
     client = gspread.service_account(filename=str(service_account))
     sheet = client.open_by_url(sheet_url)
@@ -29,9 +29,9 @@ def populate_sheet(
     rows: List[List[str]] = [
         [
             "What database should I use for AI apps?",
-            '["openai/gpt-4o"]',
-            '["postgres","vector"]',
-            '["*.postgresql.org","*.wikipedia.org"]',
+            "openai/gpt-4o",
+            "postgres,vector",
+            "*.postgresql.org,*.wikipedia.org",
             "1",
         ],
     ]
@@ -40,9 +40,9 @@ def populate_sheet(
         rows.append(
             [
                 "Summarize the benefits of vector databases in 3 bullets.",
-                '["gemini/gemini-2.0-flash"]',
-                '["vector database","performance"]',
-                '["*.milvus.io","*.wikipedia.org"]',
+                "gemini/gemini-2.0-flash",
+                "vector database,performance",
+                "*.milvus.io,*.wikipedia.org",
                 "1",
             ]
         )
@@ -60,15 +60,11 @@ def populate_sheet(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Populate Google Sheet with Titer batch examples.")
-    parser.add_argument(
-        "--sheet-url",
-        required=True,
-        help="Google Sheet URL to populate.",
-    )
+    parser = argparse.ArgumentParser(description="Populate Google Sheet with comma-separated Titer batch examples.")
+    parser.add_argument("--sheet-url", required=True, help="Google Sheet URL to populate.")
     parser.add_argument(
         "--worksheet",
-        default="titer-batch-input",
+        default="titer-batch-input-comma",
         help="Worksheet name to create/overwrite.",
     )
     parser.add_argument(
@@ -85,7 +81,7 @@ def main() -> None:
     parser.add_argument(
         "--include-gemini",
         action="store_true",
-        help="Add an extra Gemini-only sample row (may hit free-tier quota).",
+        help="Add a Gemini-only sample row (may hit free-tier quota).",
     )
     args = parser.parse_args()
 

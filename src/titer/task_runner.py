@@ -108,16 +108,40 @@ def _parse_list(value: Any) -> List[str]:
             return [str(item) for item in parsed]
     except json.JSONDecodeError:
         pass
-    return [part.strip() for part in text.split("|") if part.strip()]
+    # Support '|' or ',' separated lists for user-friendly sheets.
+    delimiter = "|" if "|" in text else ","
+    return [part.strip() for part in text.split(delimiter) if part.strip()]
+
+
+def _parse_prompt(value: Any) -> List[str]:
+    """Parse a single prompt value; do NOT split on commas/pipes to keep prompt text intact."""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [str(item) for item in value]
+    text = str(value)
+    if not text.strip():
+        return []
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, list):
+            return [str(item) for item in parsed]
+    except json.JSONDecodeError:
+        pass
+    return [text]
 
 
 def _parse_task_rows(rows: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
     tasks: List[Dict[str, Any]] = []
     for index, row in enumerate(rows):
         try:
+            prompts = _parse_prompt(row.get("prompt"))
+            if not prompts:
+                # Backwards compatibility: fall back to "prompts" column.
+                prompts = _parse_prompt(row.get("prompts"))
             tasks.append(
                 {
-                    "prompts": _parse_list(row.get("prompts")),
+                    "prompts": prompts,
                     "engines": _parse_list(row.get("engines")),
                     "keywords": _parse_list(row.get("keywords")),
                     "domain_wildcards": _parse_list(row.get("domain_wildcards")),
