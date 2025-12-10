@@ -91,7 +91,8 @@ def write_results_to_sheet(
     if place_first:
         _move_worksheet_to_front(sheet, ws)
     fieldnames = list(rows[0].keys())
-    data = [fieldnames] + [[row.get(field, "") for field in fieldnames] for row in rows]
+    data_rows = _prepare_sheet_rows(rows, fieldnames)
+    data = [fieldnames] + data_rows
     ws.clear()
     ws.update(values=data)
     return sheet.url
@@ -195,3 +196,18 @@ def _move_worksheet_to_front(sheet: gspread.Spreadsheet, ws: gspread.Worksheet) 
         sheet.reorder_worksheets([ws] + others)
     except Exception:
         pass
+
+
+def _prepare_sheet_rows(rows: Sequence[Dict[str, Any]], fieldnames: Sequence[str], max_len: int = 45000) -> List[List[str]]:
+    """Ensure no cell exceeds Sheets limits by truncating long content."""
+    prepared: List[List[str]] = []
+    for row in rows:
+        prepared_row: List[str] = []
+        for field in fieldnames:
+            value = row.get(field, "")
+            text = "" if value is None else str(value)
+            if len(text) > max_len:
+                text = text[: max_len - 3] + "..."
+            prepared_row.append(text)
+        prepared.append(prepared_row)
+    return prepared
