@@ -140,6 +140,7 @@ def batch(
             worksheet=output_sheet_worksheet,
             service_account_path=service_account,
             share_public=share_output_sheet,
+            place_first=True,
         )
 
     payload = [result.as_dict() for result in results]

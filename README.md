@@ -104,3 +104,7 @@ Each input row produces one output row with the columns described above.
 - Gemini: uses `google-genai` with the Google Search tool. Works with model strings such as `gemini/gemini-2.0-flash`, `gemini/gemini-1.5-flash-8b`, `gemini/gemini-1.5-pro`.
   - Free plan Gemini keys can hit rate limits; the engine retries with exponential backoff and will surface a clear error if limits persist. Prefer smaller models (`gemini-2.0-flash`, `gemini-1.5-flash-8b`) for higher reliability.
 - Additional engines can be added by implementing the `Engine` ABC (`titer/engines/base.py`) and registering them in the factory (`titer/engines/factory.py`).
+
+## GitHub workflow
+
+See `docs/github-workflow.md` for a ready-to-use weekly GitHub Actions workflow that reads tasks from Google Sheets and writes results back to Google Sheets using repository secrets.

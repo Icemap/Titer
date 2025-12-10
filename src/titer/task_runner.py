@@ -70,6 +70,7 @@ def write_results_to_sheet(
     service_account_path: Path | None = None,
     create_if_missing: bool = True,
     share_public: bool = False,
+    place_first: bool = False,
 ) -> str:
     if not rows:
         raise ValueError("No rows to write to Google Sheets.")
@@ -87,6 +88,8 @@ def write_results_to_sheet(
             pass  # If sharing fails, still proceed.
 
     ws = _get_or_create_worksheet(sheet, worksheet)
+    if place_first:
+        _move_worksheet_to_front(sheet, ws)
     fieldnames = list(rows[0].keys())
     data = [fieldnames] + [[row.get(field, "") for field in fieldnames] for row in rows]
     ws.clear()
@@ -183,3 +186,12 @@ def _get_or_create_worksheet(sheet: gspread.Spreadsheet, name: str | None) -> gs
         return sheet.worksheet(name)
     except Exception:
         return sheet.add_worksheet(title=name, rows=1000, cols=26)
+
+
+def _move_worksheet_to_front(sheet: gspread.Spreadsheet, ws: gspread.Worksheet) -> None:
+    """Place the worksheet as the first tab."""
+    try:
+        others = [w for w in sheet.worksheets() if w.id != ws.id]
+        sheet.reorder_worksheets([ws] + others)
+    except Exception:
+        pass
